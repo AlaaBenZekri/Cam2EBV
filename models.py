@@ -137,7 +137,7 @@ class Joiner(nn.Module):
 
     def forward(self, encoder_outputs):
         udepth = len(encoder_outputs[0])
-
+	self.joiner_outputs = []
         for d in range(udepth):
             filters = (2**d)*self.filters1
             warped_maps = []
