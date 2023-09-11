@@ -4,8 +4,17 @@ import numpy as np
 import xml.etree.ElementTree as xmlET
 import cv2
 from torch import cuda
-import gc, time
+import gc, time, random
+import torch
 
+def make_reproduceable(SEED=8):
+    random.seed(SEED)
+    np.random.seed(SEED)
+    torch.manual_seed(SEED)
+    torch.cuda.manual_seed(SEED)
+    os.environ['PYTHONHASHSEED'] = str(SEED)
+    torch.backends.cudnn.deterministic = True
+    
 def free_memory(sleep_time=0.1):
     gc.collect()
     cuda.synchronize()
@@ -18,6 +27,19 @@ def load_image(filename):
     img = cv2.imread(filename)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     return img
+
+def save_image(filename, img):
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    cv2.imwrite(filename, img)
+    
+def save_samples(filenames, labels, predictions, palette, path="./data/prediction"):
+    for i in range(len(labels)):
+        img1 = one_hot_decode_image(labels[i], palette)
+        img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
+        img2 = one_hot_decode_image(predictions[i], palette)
+        img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+        combined_img = np.concatenate((img1, img2), axis=1)
+        cv2.imwrite(path+"/"+filenames[i], combined_img)
 
 def resize_image(img, shape, interpolation=cv2.INTER_CUBIC):
 
