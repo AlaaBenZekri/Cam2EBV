@@ -32,4 +32,4 @@ class Cam2BEVDataset(Dataset):
         label = utils.resize_image(label, self.output_shape)
         label = utils.one_hot_encode_image(label, self.output_palette)
         label = tensor(label).to(self.device)
-        return (inputs, label)
+        return (self.images[idx], inputs, label)
